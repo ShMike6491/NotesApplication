@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "note_table")
 public class NoteEntity {
-    // entity in android MVVM pattern.
 
     @PrimaryKey(autoGenerate = true)
     private int id;
