@@ -1,15 +1,20 @@
 package com.e.notesapplication;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,40 +26,15 @@ public class MainActivity extends AppCompatActivity {
 
     private NoteViewModel viewModel;
     private FloatingActionButton addNoteBtn;
+    private RecyclerView recyclerView;
+    private Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        addNoteBtn = findViewById(R.id.fab_add_new);
-        addNoteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startAddActivity(v);
-            }
-        });
-
-        RecyclerView recyclerView = findViewById(R.id.rv_notes);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-        final Adapter adapter = new Adapter();
-        recyclerView.setAdapter(adapter);
-
-        ViewModelProvider provider = new ViewModelProvider(
-                this,
-                ViewModelProvider
-                        .AndroidViewModelFactory
-                        .getInstance(this.getApplication())
-        );
-        viewModel = provider.get(NoteViewModel.class);
-        viewModel.getAllNotes().observe(this,
-                new Observer<List<NoteEntity>>() {
-            @Override
-            public void onChanged(List<NoteEntity> noteEntities) {
-                adapter.setNotes(noteEntities);
-            }
-        });
+        initViews();
 
         //this will be needed for fragments
 
@@ -68,6 +48,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.menu_delete_all:
+                deleteAllNotes();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -76,6 +75,69 @@ public class MainActivity extends AppCompatActivity {
         } else {
             showToast("Note not saved");
         }
+    }
+
+    private void initViews() {
+        addNoteBtn = findViewById(R.id.fab_add_new);
+        addNoteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAddActivity(v);
+            }
+        });
+
+        initRecyclerView();
+        initViewModel();
+        handleSwipeDelete();
+    }
+
+    private void initViewModel() {
+        ViewModelProvider provider = new ViewModelProvider(
+                this,
+                ViewModelProvider
+                        .AndroidViewModelFactory
+                        .getInstance(this.getApplication())
+        );
+        viewModel = provider.get(NoteViewModel.class);
+        viewModel.getAllNotes().observe(this,
+                new Observer<List<NoteEntity>>() {
+                    @Override
+                    public void onChanged(List<NoteEntity> noteEntities) {
+                        adapter.setNotes(noteEntities);
+                    }
+                });
+    }
+
+    private void initRecyclerView() {
+        recyclerView = findViewById(R.id.rv_notes);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        adapter = new Adapter();
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void handleSwipeDelete() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                removeNote(viewHolder.getAdapterPosition());
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+
+    private void deleteAllNotes() {
+        viewModel.deleteAll();
+        showToast("All notes have been deleted");
+    }
+
+    private void removeNote(int position) {
+        viewModel.delete(adapter.getNoteAt(position));
+        showToast("Note deleted");
     }
 
     private void saveNoteToDB(Intent data) {
