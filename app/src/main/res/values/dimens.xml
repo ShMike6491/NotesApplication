@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="margin_item">8dp</dimen>
+    <dimen name="margin_btn_add">32dp</dimen>
+    <dimen name="margin_form_input">16dp</dimen>
 </resources>
