@@ -14,6 +14,9 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
 
+/**
+ * Оставил для референса
+ */
 public class AddEditActivity extends AppCompatActivity {
 
     private TextInputEditText title;
