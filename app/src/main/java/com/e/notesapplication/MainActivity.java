@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
         if(hasResultData(requestCode, resultCode)) {
             saveNoteToDB(data);
+        } else if (hasEditResultData(requestCode, resultCode)) {
+            editExistingNote(data);
         } else {
             showToast("Note not saved");
         }
@@ -89,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
         initRecyclerView();
         initViewModel();
         handleSwipeDelete();
+
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(NoteEntity note) {
+                startEditActivity(note);
+            }
+        });
     }
 
     private void initViewModel() {
@@ -150,13 +159,42 @@ public class MainActivity extends AppCompatActivity {
         showToast("Note saved");
     }
 
+    private void editExistingNote(Intent data) {
+        int id = data.getIntExtra(Constants.EXTRA_ID, -1);
+
+        if (id == -1) {
+            showToast("Something went wrong!");
+            return;
+        }
+
+        String title = data.getStringExtra(Constants.EXTRA_TITLE);
+        String desc = data.getStringExtra(Constants.EXTRA_DESC);
+        NoteEntity note = new NoteEntity(title, desc);
+        note.setId(id);
+        viewModel.update(note);
+
+        showToast("Note has been updated");
+    }
+
     private void startAddActivity(View v) {
         Intent intent = new Intent(MainActivity.this, AddEditActivity.class);
         startActivityForResult(intent, Constants.REQUEST_CODE);
     }
 
+    private void startEditActivity(NoteEntity note) {
+        Intent intent = new Intent(MainActivity.this, AddEditActivity.class);
+        intent.putExtra(Constants.EXTRA_TITLE, note.getTitle());
+        intent.putExtra(Constants.EXTRA_DESC, note.getDescription());
+        intent.putExtra(Constants.EXTRA_ID, note.getId());
+        startActivityForResult(intent, Constants.EDIT_CODE);
+    }
+
     private boolean hasResultData (int reqCode, int resCode) {
         return reqCode == Constants.REQUEST_CODE && resCode == RESULT_OK;
+    }
+
+    private boolean hasEditResultData (int reqCode, int resCode) {
+        return reqCode == Constants.EDIT_CODE && resCode == RESULT_OK;
     }
 
     private void showToast(String msg) {

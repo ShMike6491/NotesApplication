@@ -14,6 +14,7 @@ import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.NoteHolder> {
     private List<NoteEntity> noteList = new ArrayList<>();
+    private OnItemClickListener callback;
 
     @NonNull
     @Override
@@ -42,6 +43,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.NoteHolder> {
         notifyDataSetChanged();
     }
 
+    public void setOnItemClickListener(OnItemClickListener callback) {
+        this.callback = callback;
+    }
+
     class NoteHolder extends RecyclerView.ViewHolder {
         private MaterialTextView title;
         private MaterialTextView description;
@@ -50,6 +55,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.NoteHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.tv_title);
             description = itemView.findViewById(R.id.tv_description);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if(callback != null && position != RecyclerView.NO_POSITION) {
+                        callback.onItemClick(noteList.get(position));
+                    }
+                }
+            });
         }
 
         public void onBind(int position, NoteEntity model) {

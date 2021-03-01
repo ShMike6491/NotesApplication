@@ -45,6 +45,25 @@ public class AddEditActivity extends AppCompatActivity {
         }
     }
 
+    private void initView() {
+        title = findViewById(R.id.et_note_details_title);
+        description = findViewById(R.id.et_note_details_description);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra(Constants.EXTRA_ID)) {
+            handleIntent(intent);
+            setTitle("Edit Note");
+        } else {
+            setTitle("Add Note");
+        }
+    }
+
+    private void handleIntent(Intent intent) {
+        title.setText(intent.getStringExtra(Constants.EXTRA_TITLE));
+        description.setText(intent.getStringExtra(Constants.EXTRA_DESC));
+    }
+
     private void saveNote() {
         String name = Objects.requireNonNull(title.getText()).toString();
         String desc = Objects.requireNonNull(description.getText()).toString();
@@ -58,15 +77,13 @@ public class AddEditActivity extends AppCompatActivity {
         intent.putExtra(Constants.EXTRA_TITLE, name);
         intent.putExtra(Constants.EXTRA_DESC, desc);
 
+        int id = getIntent().getIntExtra(Constants.EXTRA_ID, -1);
+        if (id != -1) {
+            intent.putExtra(Constants.EXTRA_ID, id);
+        }
+
         setResult(RESULT_OK, intent);
         finish();
-    }
-
-    private void initView() {
-        title = findViewById(R.id.et_note_details_title);
-        description = findViewById(R.id.et_note_details_description);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Note");
     }
 
     private boolean isEmpty(String name, String desc) {
