@@ -10,6 +10,14 @@ Notes is a simple application to show and store basic notes. This is a single ac
 </br>
 </br>
 </br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
 
 Lessons
 =====================
