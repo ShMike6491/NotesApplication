@@ -1,7 +1,7 @@
 NotesApplication
 =====================
 
-Notes is a simple application to show and store basic notes. This is a single activity type application. No specific architecture or patterns were applied in making this project. 
+Notes is a simple application to show and store basic notes. This is a single activity type application. No specific architecture or patterns were applied in making of this project. The purpuse of studies was to gain a good understanding of fragment's lifecycles, transitions and other platforms elements. 
 
 ---------------------
 <img align="left" src="https://drive.google.com/uc?export=view&id=11ALAfvsDPR6ZcQlZM1VvBuCnTbjk-ycr" alt="alt text" width="200" height="400">
