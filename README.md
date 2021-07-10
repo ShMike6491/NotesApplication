@@ -7,6 +7,9 @@ NotesApplication
 Notes is a simple application to show and store basic notes. This is a single activity type application. No specific architecture or patterns were applied in making this project. 
 
 </br>
+</br>
+</br>
+</br>
 
 Lessons
 =====================
